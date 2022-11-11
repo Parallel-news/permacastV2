@@ -15,11 +15,9 @@ import {
 } from '../utils/shorthands.js';
 import { 
   arweave,
-  smartweave,
   NFT_SRC,
   CONTRACT_SRC,
   FEE_MULTIPLIER,
-  VERTO_CONTRACT,
   TREASURY_ADDRESS,
   EPISODE_UPLOAD_FEE_PERCENTAGE
 } from '../utils/arweave.js';
@@ -37,17 +35,6 @@ export default function UploadEpisode({ podcast }) {
   const [uploadProgress, setUploadProgress] = useState(false)
   const [uploadPercentComplete, setUploadPercentComplete] = useState(0)
 
-  const listEpisodeOnVerto = async (episodeId) => {
-    const vertoContractId = VERTO_CONTRACT;
-    const input = {
-      "function": "list",
-      "id": episodeId,
-      "type": "art"
-    };
-    const contract = smartweave.contract(vertoContractId).connect('use_wallet');
-    await contract.writeInteraction(input);
-  }
-
   const uploadEpisodeToArweave = async (data, fileType, epObj, event, serviceFee) => {
     const wallet = await fetchWalletAddress() // window.arweaveWallet.getActiveAddress();
     console.log(wallet);
@@ -62,9 +49,6 @@ export default function UploadEpisode({ podcast }) {
       tx.addTag("Contract-Src", NFT_SRC);
       tx.addTag("Init-State", initState);
       tx.addTag("Permacast-Version", "amber");
-      // Verto aNFT listing
-      tx.addTag("Exchange", "Verto");
-      tx.addTag("Action", "marketplace/create");
       tx.addTag("Thumbnail", podcast.cover);
      
       tx.reward = (+tx.reward * FEE_MULTIPLIER).toString();
@@ -126,7 +110,7 @@ export default function UploadEpisode({ podcast }) {
     epObj.name = event.target.episodeName.value
     epObj.desc = event.target.episodeShowNotes.value
     epObj.index = podcast.index
-    epObj.verto = event.target.verto.checked
+    epObj.verto = false // finished
     let episodeFile = event.target.episodeMedia.files[0]
     let fileType = episodeFile.type
     console.log(fileType)
@@ -205,12 +189,6 @@ export default function UploadEpisode({ podcast }) {
     await arweave.transactions.post(interaction);
     console.log('addEpisode txid:');
     console.log(interaction.id)
-    if (show.verto) {
-      console.log('pushing to Verto')
-      await listEpisodeOnVerto(interaction.id)
-    } else {
-      console.log('skipping Verto')
-    }
   }
 
   const onFileUpload = async(file) => {
@@ -274,10 +252,6 @@ export default function UploadEpisode({ podcast }) {
                 </div>
               ) : null}
               <div className="mt-8 flex items-center justify-between text-zinc-200">
-                <label className="cursor-pointer label flex justify-start">
-                  <input className="checkbox checkbox-primary mx-2" type="checkbox" id="verto" />
-                  <span className="label-text transition duration-300 ease-in-out hover:text-white">{t("uploadepisode.verto")}</span>
-                </label>
                 {!episodeUploading ?
                   <button
                     className="btn btn-secondary bg-zinc-800 hover:bg-zinc-600 transition duration-300 ease-in-out hover:text-white rounded-xl px-8"
