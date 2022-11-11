@@ -7,9 +7,7 @@ import { PlusIcon, HeartIcon } from '@heroicons/react/24/solid';
 import Track from '../component/track.jsx';
 import TipButton from '../component/reusables/tip.jsx';
 import UploadEpisode from './uploadEpisode.jsx';
-import { arweave, smartweave, NEWS_CONTRACT, MESON_ENDPOINT } from '../utils/arweave.js';
-// import * as SmartWeaveSdk from 'redstone-smartweave';
-// import { contract } from 'redstone-smartweave';
+import { arweave, NEWS_CONTRACT, MESON_ENDPOINT } from '../utils/arweave.js';
 // import { Dialog, Transition } from '@headlessui/react'
 // import { Fragment } from 'react'
 import { 

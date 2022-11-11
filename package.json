@@ -34,7 +34,6 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "recoil": "^0.7.6",
-    "redstone-smartweave": "^0.4.29",
     "shikwasa": "^2.1.2",
     "smartweave": "^0.4.41",
     "sweetalert2": "^11.4.0",
@@ -44,9 +43,6 @@
   },
   "devDependencies": {
     "react-error-overlay": "6.0.9"
-  },
-  "engines": {
-    "node": ">=16.0.1 <17.0.1"
   },
   "scripts": {
     "start": "concurrently \"npm run start:css\" \"react-scripts start\"",
