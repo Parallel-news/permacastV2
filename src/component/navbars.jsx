@@ -1,15 +1,29 @@
 import React, { useState, useEffect, useContext  } from 'react';
 import { useHistory, useLocation } from "react-router-dom";
-import { useTranslation } from 'react-i18next';
-import Swal from 'sweetalert2';
-import { Disclosure } from '@headlessui/react'
-import { HomeIcon, RectangleStackIcon, LanguageIcon, PlusIcon, QuestionMarkCircleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import YellowRec from '../yellow-rec.svg'
-import { Cooyub } from './reusables/icons';
-import ArConnect from './arconnect';
-import { Searchbar } from '../pages/search';
-import { appContext } from '../utils/initStateGen';
-import LANGUAGES from '../utils/languages';
+import { useTranslation } from "react-i18next";
+import Swal from "sweetalert2";
+import { Disclosure } from "@headlessui/react";
+import {
+  HomeIcon,
+  RectangleStackIcon,
+  LanguageIcon,
+  PlusIcon,
+  QuestionMarkCircleIcon,
+  Bars3Icon,
+  XMarkIcon,
+  VideoCameraIcon,
+  MicrophoneIcon
+} from "@heroicons/react/24/outline";
+import YellowRec from "../yellow-rec.svg";
+import { Cooyub } from "./reusables/icons";
+import ArConnect from "./arconnect";
+import { Searchbar } from "../pages/search";
+import { appContext } from "../utils/initStateGen";
+import LANGUAGES from "../utils/languages";
+import { UploadCount } from './upload_count';
+import { UploadsModal } from './uploadsModal';
+import { useRecoilValue } from 'recoil';
+import { coverUploads, audioUploads, videoUploads } from '../atoms';
 
 export function Sidenav() {
   const { t, i18n } = useTranslation();
@@ -52,10 +66,37 @@ export function Sidenav() {
             ))}
           </ul>
         </div>
-        <button className="w-9 h-9 btn btn-ghost btn-sm btn-square hover:text-zinc-200" onClick={() => {switchView("uploadpodcast")}} style={{color: cond("/uploadpodcast") ? 'white': ''}} disabled={cond("/uploadpodcast") ? true: false}>
-          <PlusIcon />
-        </button>
-        <a target="_blank" rel="noreferrer" href="https://t.me/permacast" className="w-9 h-9 btn btn-ghost btn-sm btn-square hover:text-zinc-200">
+        <div className="dropdown dropdown-hover mb-[-6px]">
+          <button
+            tabIndex="0"
+            className="w-9 h-9 btn btn-ghost btn-sm btn-square hover:text-zinc-200"
+          >
+            <PlusIcon />
+          </button>
+          <ul
+            tabIndex="0"
+            className="dropdown-content menu p-2 shadow bg-zinc-900 rounded-box w-32"
+          >
+              <li>
+                <span onClick={() => {
+                  switchView("uploadpodcast")
+                }}
+                >Audio</span>
+              </li>
+              <li>
+                <span onClick={() => {
+                  switchView("uploadvideoshow")
+              }}
+              >Video</span>
+              </li>
+          </ul>
+        </div>
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://t.me/permacast"
+          className="w-9 h-9 btn btn-ghost btn-sm btn-square hover:text-zinc-200"
+        >
           <QuestionMarkCircleIcon />
         </a>
       </div>
@@ -65,6 +106,13 @@ export function Sidenav() {
 
 export function NavBar() {
   const appState = useContext(appContext);
+  const { length: covers } = useRecoilValue(coverUploads);
+  const { length: audios } = useRecoilValue(audioUploads);
+  const { length: videos } = useRecoilValue(videoUploads);
+  // useRecoilValue(uploadPercent);
+
+  const { t, i18n } = useTranslation();
+  const { isOpen, setIsOpen } = appState.globalModal;
 
   return (
     <>
@@ -80,6 +128,15 @@ export function NavBar() {
             <div className="w-full bg-zinc-800 h-12 rounded-full animate-pulse"></div>
           }
           </div>
+
+          {(covers + audios + videos)  > 0 ?  <div className="ml-8 w-32">
+          
+            <button onClick={() => setIsOpen(true)} className="relative text-zinc-300 hover:text-white cursor-pointer btn btn-secondary rounded-full bg-zinc-900 hover:bg-zinc-600">
+            <UploadCount count={(covers + audios + videos)}/>
+            {t("uploadshow.uploadstitle")}
+            </button>
+            <UploadsModal t={t} />
+          </div> : <></>}
           <div className="ml-8 w-72">
             <ArConnect />
           </div>

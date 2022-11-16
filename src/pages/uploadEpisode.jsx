@@ -1,4 +1,3 @@
-
 import ArDB from 'ardb';
 import Swal from 'sweetalert2';
 import { useState, useContext } from 'react';
@@ -13,7 +12,7 @@ import {
   fetchWalletAddress,
   calculateStorageFee
 } from '../utils/shorthands.js';
-import { 
+import {
   arweave,
   smartweave,
   NFT_SRC,
@@ -23,6 +22,12 @@ import {
   TREASURY_ADDRESS,
   EPISODE_UPLOAD_FEE_PERCENTAGE
 } from '../utils/arweave.js';
+import { UploadMeter } from '../component/upload_meter';
+import { useRecoilState } from 'recoil';
+import { audioUploads, videoUploads } from '../atoms';
+
+
+
 
 const ardb = new ArDB(arweave);
 
@@ -30,12 +35,13 @@ const ardb = new ArDB(arweave);
 export default function UploadEpisode({ podcast }) {
   const { t } = useTranslation()
   const appState = useContext(appContext);
-  const {isOpen, setIsOpen} = appState.globalModal;
+  const { isOpen, setIsOpen } = appState.globalModal;
   const [episodeFileName, setEpisodeFileName] = useState(null);
   const [episodeUploadFee, setEpisodeUploadFee] = useState(0)
   const [episodeUploading, setEpisodeUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(false)
   const [uploadPercentComplete, setUploadPercentComplete] = useState(0)
+  const setAudioUploadsList = useRecoilState(audioUploads);
 
   const listEpisodeOnVerto = async (episodeId) => {
     const vertoContractId = VERTO_CONTRACT;
@@ -66,9 +72,9 @@ export default function UploadEpisode({ podcast }) {
       tx.addTag("Exchange", "Verto");
       tx.addTag("Action", "marketplace/create");
       tx.addTag("Thumbnail", podcast.cover);
-     
+
       tx.reward = (+tx.reward * FEE_MULTIPLIER).toString();
-      
+
       await arweave.transactions.sign(tx);
       console.log("signed tx", tx);
       const uploader = await arweave.transactions.getUploader(tx);
@@ -77,10 +83,19 @@ export default function UploadEpisode({ podcast }) {
         await uploader.uploadChunk();
 
         setUploadProgress(true)
+        setAudioUploadsList(l => {
+          const list = [...l].filter(item => item.id === tx.id)
+          list.push({
+            percent: uploader.pctComplete,
+            id: tx.id,
+            ...epObj
+          })
+          return list
+        })
         setUploadPercentComplete(uploader.pctComplete)
       }
       if (uploader.txPosted) {
-        const newTx = await arweave.createTransaction({target:TREASURY_ADDRESS, quantity: arweave.ar.arToWinston('' + serviceFee)})
+        const newTx = await arweave.createTransaction({ target: TREASURY_ADDRESS, quantity: arweave.ar.arToWinston('' + serviceFee) })
         console.log(newTx)
         await arweave.transactions.sign(newTx)
         console.log(newTx)
@@ -193,12 +208,12 @@ export default function UploadEpisode({ podcast }) {
     let tags = { "Contract": contract, "App-Name": "SmartWeaveAction", "App-Version": "0.3.0", "Content-Type": "text/plain", "Input": JSON.stringify(input), "Permacast-Version": "amber" }
     // let contract = smartweave.contract(theContractId).connect("use_wallet");
     // let txId = await contract.writeInteraction(input, tags);
-    const interaction = await arweave.createTransaction({data: show.desc});
+    const interaction = await arweave.createTransaction({ data: show.desc });
 
     for (let key in tags) {
       interaction.addTag(key, tags[key]);
     }
-    
+
     interaction.reward = (+interaction.reward * FEE_MULTIPLIER).toString();
 
     await arweave.transactions.sign(interaction);
@@ -213,7 +228,7 @@ export default function UploadEpisode({ podcast }) {
     }
   }
 
-  const onFileUpload = async(file) => {
+  const onFileUpload = async (file) => {
     if (file) {
       setEpisodeFileName(file?.name)
       const uploadPrice = await calculateStorageFee(file?.byteLength);
@@ -222,6 +237,7 @@ export default function UploadEpisode({ podcast }) {
       setEpisodeUploadFee(totalFee)
     }
   }
+
 
   return (
     <Modal>
@@ -255,7 +271,9 @@ export default function UploadEpisode({ podcast }) {
               {uploadProgress && (
                 <>
                   <div className="text-xl text-white">{t("uploadepisode.uploaded")}</div>
-                  <progress className="progress-primary mt-3" value={uploadPercentComplete} max="100"></progress>
+                  <UploadMeter t={t} percent={uploadPercentComplete} title={t("uploadepisode.file")} id={""} />
+                  {/* <progress className="progress-primary mt-3" value={uploadPercentComplete} max="100"></progress> */}
+
                 </>
               )}
               <div className="bg-zinc-700 rounded-lg p-4">

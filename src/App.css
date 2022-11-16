@@ -4,11 +4,32 @@
 
 
 .HideScollBar::-webkit-scrollbar {
-    display: none;
-  }
-  
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .HideScollBar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.HideScollBar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+.customBar::-webkit-scrollbar-track {
+  background: theme('colors.zinc.800');
+  border-radius: 2rem;
+}
+
+/* Handle */
+.customBar::-webkit-scrollbar-thumb {
+  background: rgb(255,255, 0);
+  border-radius: 2rem;
+}
+
+/* Handle on hover */
+.customBar::-webkit-scrollbar-thumb:hover {
+  /* background: theme('colors.yellow.200'); */
+}
