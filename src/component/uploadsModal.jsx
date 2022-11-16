@@ -28,16 +28,15 @@ export const UploadsModal = (props) => {
                 <UploadMeter t={t} percent={percent} title={name} id={id} />
             </div>
             {percent === 100 && <div onClick={() => {
-                console.log(children);
                 const remove = l => [...l].filter(coverObj => coverObj.id !== id);
                 switch (children) {
-                    case "Audio Episode":
+                    case "Audio Episodes":
                         setAudioList(remove)
                         break;
-                    case "Videos Episode":
+                    case "Video Episodes":
                         setVideoList(remove)
                         break;
-                    case "Podcast Covers":
+                    case "Podcast Cover Images":
                         setCoverList(remove)
                         break;
                     default:
