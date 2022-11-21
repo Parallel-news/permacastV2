@@ -6,6 +6,8 @@ import { UploadMeter } from './upload_meter';
 import { useRecoilState } from 'recoil';
 import { coverUploads, audioUploads, videoUploads } from '../atoms';
 
+import { LinkIcon } from "@heroicons/react/24/solid";
+
 export const UploadsModal = (props) => {
     const { t, } = props;
 
@@ -24,28 +26,43 @@ export const UploadsModal = (props) => {
     const ListElement = ({ ListType, children }) => <>
         {ListType.length > 0 && <h1 className="text-2xl tracking-wider text-white mt-8">{children}</h1>}
         {ListType.map(({ percent, id, name }, index) => <div key={index} className="mx-auto flex flex-row flex-wrap">
-            <div style={{ width: percent >= 100 ? "calc(100% - 4rem)" : "100%" }}>
-                <UploadMeter t={t} percent={percent} title={name} id={id} />
+            <div className="flex flex-wrap bg-zinc-700 px-2 py-0.5 mt-4 rounded-3xl w-full border-2 border-zinc-500">
+                <div className="w-full flex flex-row flex-nowrap ">
+                    <div style={{ width: percent >= 100 ? "calc(100% - 3rem)" : "100%" }}>
+                        <UploadMeter t={t} percent={percent} title={name} id={id} />
+                    </div>
+                    {percent === 100 && <div onClick={() => {
+                        const remove = l => [...l].filter(coverObj => coverObj.id !== id);
+                        switch (children) {
+                            case "Audio Episodes":
+                                setAudioList(remove)
+                                break;
+                            case "Video Episodes":
+                                setVideoList(remove)
+                                break;
+                            case "Podcast Cover Images":
+                                setCoverList(remove)
+                                break;
+                            default:
+                                break;
+                        }
+                    }}
+                        className="text-xl text-center content-center w-7 h-7 leading-6 my-4 ml-4 bg-zinc-900 rounded-full cursor-pointer active:bg-zinc-700 border-2 border-zinc-500" >
+                        ×
+                    </div>}
+                </div>
+
+                    <div className="flex flex-nowrap bg-zinc-900 h-6 p-2 mb-4 rounded-3xl w-full btn btn-ghost btn-sm btn-square hover:text-zinc-200 text-white  border-2 border-zinc-500">
+                        <div className="my-auto w-4 h-4" onClick={console.log}>
+                            <LinkIcon />
+                        </div>
+                        <div className="ml-2 my-auto h-4 text-ellipsis truncate" onClick={() => window.open(`https://v2.viewblock.io/arweave/tx/${id}`, '_blank')}>
+                            {id}
+                        </div>
+
+                    </div>
+
             </div>
-            {percent === 100 && <div onClick={() => {
-                const remove = l => [...l].filter(coverObj => coverObj.id !== id);
-                switch (children) {
-                    case "Audio Episodes":
-                        setAudioList(remove)
-                        break;
-                    case "Video Episodes":
-                        setVideoList(remove)
-                        break;
-                    case "Podcast Cover Images":
-                        setCoverList(remove)
-                        break;
-                    default:
-                        break;
-                }
-            }}
-                className="text-2xl text-center content-center w-8 h-8 my-4 ml-4 bg-zinc-600 rounded-full cursor-pointer active:bg-zinc-700" >
-                ×
-            </div>}
         </div>
         )}
     </>

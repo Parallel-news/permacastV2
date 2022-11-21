@@ -20,8 +20,8 @@ export const UploadMeter = (props) => {
 
                         
                         {/* <div className="block px-2 md:px-[8px] my-2 py-2 md:py-[8px] text-xs md:text-base w-full h-8 rounded-full bg-zinc-900 text-zinc-100 outline-none"> */}
-                        <div className={"flex text-xs md:text-base h-7 rounded-full bg-zinc-600 text-zinc-100 outline-none relative" + color} >
-                            <div className={"flex text-xs md:text-base h-7 rounded-full bg-green-900 text-zinc-100 outline-none absolute" + color} style={{ width: `${percent}%`}}>
+                        <div className={"flex text-xs md:text-base h-7 rounded-full bg-zinc-900 text-zinc-100 outline-none relative border-2 overflow-hidden border-zinc-500" + color} >
+                            <div className={"flex text-xs md:text-base h-6 rounded-full bg-green-900 text-zinc-100 outline-none absolute" + color} style={{ width: `${percent}%`}}>
                                 <div className="flex flex-row w-full my-auto px-2 justify-between">
                                 <p className="truncate text-left">{title}</p>
                                 <p className="ml-2 font-extrabold text-right">{percent}%</p>
