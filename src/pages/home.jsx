@@ -155,7 +155,7 @@ export default function Home({ recentlyAdded, featuredPodcasts }) {
             <Loading />
           )}
         </div>
-        {Object.keys(secondaryData_).length > 0 ? (
+        {Object.keys(primaryData_).length > 0 ? (
           <div className="w-full">
             <FeaturedCreators />
           </div>

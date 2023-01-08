@@ -74,19 +74,15 @@ export function FeaturedEpisode() {
         } else {
           return obj.contentType === "video/";
         }
-      })[
+      })[0]
 
-        0
-
-        // Math.floor(Math.random() * primaryData_.podcasts.filter((obj) => {
-        //   if (switchFocus_) {
-        //     return obj.contentType === "audio/";
-        //   } else {
-        //     return obj.contentType === "video/";
-        //   }
-        // }).length) + 1
-
-      ]
+      // Math.floor(Math.random() * primaryData_.podcasts.filter((obj) => {
+      //   if (switchFocus_) {
+      //     return obj.contentType === "audio/";
+      //   } else {
+      //     return obj.contentType === "video/";
+      //   }
+      // }).length) + 1
     );
   }, [switchFocus_]);
   return (
@@ -127,7 +123,7 @@ export function FeaturedEpisode() {
                   secondaryData_.episodes[0],
                   secondaryData_.episodes[0].eid
                 );
-                setCA_([secondaryData_.episodes[0].eid, 'playing'])
+                setCA_([secondaryData_.episodes[0].eid, "playing"]);
               } else {
                 setVS_([
                   "https://arweave.net/" + secondaryData_.episodes[0].contentTx,
@@ -136,12 +132,18 @@ export function FeaturedEpisode() {
               }
             }}
           >
-            { ca_[0] === secondaryData_.episodes[0].eid ?
+            {ca_[0] === secondaryData_.episodes[0].eid ? (
               <FaPause className="w-3 h-3" />
-              :
+            ) : (
               <FaPlay className="w-3 h-3" />
-            }
-            <div className="ml-2">{t(ca_[0] === secondaryData_.episodes[0].eid ? "home.pausefeaturedepisode" : "home.playfeaturedepisode")}</div>
+            )}
+            <div className="ml-2">
+              {t(
+                ca_[0] === secondaryData_.episodes[0].eid
+                  ? "home.pausefeaturedepisode"
+                  : "home.playfeaturedepisode"
+              )}
+            </div>
           </div>
           <div
             className="min-w-min btn btn-secondary border-0 mt-5 rounded-full flex items-center cursor-pointer backdrop-blur-md"
@@ -185,18 +187,25 @@ export function FeaturedPodcast({ podcast }) {
   const [vs_, setVS_] = useRecoilState(videoSelection);
   const [primaryData_, setPrimaryData_] = useRecoilState(primaryData); // Global Podcasts Object
   const [secondaryData_, setSecondaryData_] = useRecoilState(secondaryData); // Selected Podcast Object
-  const [colorData_, setColorData_] = useState([]); 
+  const [colorData_, setColorData_] = useState([]);
   const [ca_, setCA_] = useRecoilState(currentAudio); // Current Audio Object
 
   return (
     <>
-      <div className={`mt-4 rounded-3xl text-white/30 relative overflow-hidden`}>
-          <img src={`https://arweave.net/${cover}`} className={`absolute top-0 right-0 h-full opacity-80 object-cover`}/>
-          <div className={`w-full h-full bg-black/20 backdrop-blur-lg absolute top-0 right-0`}/>
+      <div
+        className={`mt-4 rounded-3xl text-white/30 relative overflow-hidden`}
+      >
+        <img
+          src={`https://arweave.net/${cover}`}
+          className={`absolute top-0 right-0 h-full opacity-80 object-cover`}
+        />
+        <div
+          className={`w-full h-full bg-black/20 backdrop-blur-lg absolute top-0 right-0`}
+        />
         <div className="h-1/6 w-full px-5 pb-2 cursor-pointer relative">
           <div
             onClick={() => {
-              history.push(`/podcast/${secondaryData_.pid}`)
+              history.push(`/podcast/${secondaryData_.pid}`);
             }}
           >
             <div className="pt-5 pb-3 text-xs">
@@ -226,7 +235,7 @@ export function FeaturedPodcast({ podcast }) {
                     secondaryData_.episodes[0],
                     secondaryData_.episodes[0].eid
                   );
-                  setCA_([secondaryData_.episodes[0].eid, 'playing'])
+                  setCA_([secondaryData_.episodes[0].eid, "playing"]);
                 } else {
                   setVS_([
                     "https://arweave.net/" +
@@ -241,12 +250,14 @@ export function FeaturedPodcast({ podcast }) {
                 innerColor={"black"}
                 outerColor={textColor}
               /> */}
-              <div className={`text-black/80 bg-white/50 rounded-[50%] w-[40px] h-[40px] flex flex-col justify-center items-center`}>
-              { ca_[0] === secondaryData_.episodes[0].eid ?
-              <FaPause className="w-4 h-4" />
-              :
-              <FaPlay className="w-4 h-4" />
-            }
+              <div
+                className={`text-black/80 bg-white/50 rounded-[50%] w-[40px] h-[40px] flex flex-col justify-center items-center`}
+              >
+                {ca_[0] === secondaryData_.episodes[0].eid ? (
+                  <FaPause className="w-4 h-4" />
+                ) : (
+                  <FaPlay className="w-4 h-4" />
+                )}
               </div>
             </div>
             <div
@@ -271,15 +282,17 @@ export function FeaturedPodcastsMobile() {
   const [switchFocus_, setSwitchFocus_] = useRecoilState(switchFocus);
   const [primaryData_, setPrimaryData_] = useRecoilState(primaryData);
   const [secondaryData_, setSecondaryData_] = useRecoilState(secondaryData);
-  const podcasts = primaryData_.podcasts.filter((obj) => {
-    if (switchFocus_) {
-      return obj.contentType === "audio/";
-    } else {
-      return obj.contentType === "video/";
-    }
-  }).filter((obj__) => {
-    return obj__.episodes.length > 0
-  })
+  const podcasts = primaryData_.podcasts
+    .filter((obj) => {
+      if (switchFocus_) {
+        return obj.contentType === "audio/";
+      } else {
+        return obj.contentType === "video/";
+      }
+    })
+    .filter((obj__) => {
+      return obj__.episodes.length > 0;
+    });
 
   return (
     <div className="carousel">
@@ -311,17 +324,19 @@ export function RecentlyAdded() {
     }
   };
   useEffect(() => {
-    const data_ = primaryData_.podcasts.filter((obj) => {
-      if (switchFocus_) {
-        return obj.contentType === "audio/";
-      } else {
-        return obj.contentType === "video/";
-      }
-    }).filter((obj_) => {
-      return obj_.episodes.length > 0
-    });
+    const data_ = primaryData_.podcasts
+      .filter((obj) => {
+        if (switchFocus_) {
+          return obj.contentType === "audio/";
+        } else {
+          return obj.contentType === "video/";
+        }
+      })
+      .filter((obj_) => {
+        return obj_.episodes.length > 0;
+      });
     data_.forEach((obj) => {
-      const x_ = obj.episodes
+      const x_ = obj.episodes;
       setEpisodes(episodes.concat(x_));
     });
   }, []);
@@ -351,11 +366,20 @@ export function FeaturedCreators() {
 
   const loading = appState.otherComponentsLoading.creators;
   const creators = appState.creators;
-
+  const [primaryData_] = useRecoilState(primaryData);
+  const data_ = [];
+  primaryData_.podcasts.forEach((obj) => {
+    if (!data_.includes(primaryData_.podcasts.filter((obj_) => {
+      return obj_.owner === obj.owner
+    })[0])) {
+      data_.push(obj);
+    }
+  });
+  console.log(data_);
   return (
     <div>
       <h2 className="text-zinc-400 mb-4">{t("home.featuredcreators")}</h2>
-      {loading ? (
+      {Object.keys(primaryData_).length < 1 ? (
         <>
           <div className="bg-gray-300/30 animate-pulse w-full h-20 mb-4 mt-4 rounded-full"></div>
           <div className="bg-gray-300/30 animate-pulse w-full h-20 mb-4 rounded-full"></div>
@@ -363,15 +387,15 @@ export function FeaturedCreators() {
         </>
       ) : (
         <>
-          {creators.map((creator, index) => (
+          {data_.map((creator, index) => (
             <div key={index}>
               <div className="flex justify-between items-center p-4 mb-4 w-full border-zinc-800 border rounded-3xl">
                 <div className="flex items-center">
-                  {creator?.avatar ? (
+                  {creator?.cover ? (
                     <img
                       className="rounded-full h-12 w-12 object-cover"
-                      src={"https://arweave.net/" + creator?.avatar}
-                      alt={creator?.nickname}
+                      src={"https://arweave.net/" + creator?.cover}
+                      alt={creator?.author}
                     />
                   ) : (
                     <Cooyub
@@ -383,7 +407,7 @@ export function FeaturedCreators() {
                   <div className="ml-4 flex items-center">
                     <div className="flex flex-col">
                       <div className="text-zinc-100 text-sm cursor-pointer">
-                        {creator?.nickname || creator?.user}
+                        {creator?.author || creator?.owner}
                       </div>
                       {creator?.label && (
                         <div className="text-zinc-400 cursor-pointer text-[8px]">
@@ -397,7 +421,7 @@ export function FeaturedCreators() {
                   <p
                     className="px-3 py-2 rounded-full text-[10px] ml-5 cursor-pointer"
                     style={{ backgroundColor: bg, color: themeColor }}
-                    onClick={() => history.push("/creator/" + creator?.user)}
+                    onClick={() => history.push("/creator/" + creator?.owner)}
                   >
                     {t("view")}
                   </p>
