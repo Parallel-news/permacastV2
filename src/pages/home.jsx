@@ -39,7 +39,7 @@ export default function Home({ recentlyAdded, featuredPodcasts }) {
   const appState = useContext(appContext);
 
   const [switchFocus_, setSwitchFocus_] = useRecoilState(switchFocus);
-  const [primaryData_, ] = useRecoilState(primaryData);
+  const [primaryData_] = useRecoilState(primaryData);
   const [secondaryData_, setSecondaryData_] = useRecoilState(secondaryData);
 
   const [recentlyAdded_, setRecentlyAdded_] = useState([]);
@@ -51,35 +51,32 @@ export default function Home({ recentlyAdded, featuredPodcasts }) {
     const getAllData_ = () => {
       setSecondaryData_(
         primaryData_.podcasts.filter((obj) => {
-          if(switchFocus_){
-            return obj.contentType === 'audio/'
-          }else{
-            return obj.contentType === 'video/'
+          if (switchFocus_) {
+            return obj.contentType === "audio/";
+          } else {
+            return obj.contentType === "video/";
           }
         })[0]
       );
       setRecentlyAdded_(
         primaryData_.podcasts.filter((obj) => {
-          if(switchFocus_){
-            return obj.contentType === 'audio/'
-          }else{
-            return obj.contentType === 'video/'
+          if (switchFocus_) {
+            return obj.contentType === "audio/";
+          } else {
+            return obj.contentType === "video/";
           }
         })
       );
     };
 
-
-    if(primaryData_.podcasts) {
+    if (primaryData_.podcasts) {
       try {
         getAllData_();
-       } catch (e) {
-         console.log(e);
-       }
+      } catch (e) {
+        console.log(e);
+      }
     }
-  
   }, [primaryData_]);
-
   return (
     <div className="overflow-scroll w-full pb-10 mb-10">
       {Object.keys(secondaryData_).length > 0 ? <Greeting /> : <Loading />}
@@ -96,9 +93,11 @@ export default function Home({ recentlyAdded, featuredPodcasts }) {
             onClick={() => {
               setSwitchFocus_(true);
               setRecentlyAdded_(
-                primaryData_.podcasts.filter((obj) => obj.contentType === "audio/")
-                );
-                // handler({x: 'req'})
+                primaryData_.podcasts.filter(
+                  (obj) => obj.contentType === "audio/"
+                )
+              );
+              // handler({x: 'req'})
             }}
           >
             <p className={`m-2 text-black/80 font-medium text-[13px]`}>
@@ -115,7 +114,9 @@ export default function Home({ recentlyAdded, featuredPodcasts }) {
             onClick={() => {
               setSwitchFocus_(false);
               setRecentlyAdded_(
-                primaryData_.podcasts.filter((obj) => obj.contentType === "video/")
+                primaryData_.podcasts.filter(
+                  (obj) => obj.contentType === "video/"
+                )
               );
               // console.log(data_)
             }}
@@ -127,11 +128,13 @@ export default function Home({ recentlyAdded, featuredPodcasts }) {
         </div>
       )}
 
-      { Object.keys(secondaryData_).length > 0 ? (
+      {Object.keys(secondaryData_).length > 0 ? (
         <div className="hidden md:block">
           <FeaturedEpisode />
         </div>
-      ) : <Loading />}
+      ) : (
+        <Loading />
+      )}
 
       {/* {Object.keys(secondaryData_).length > 0 ? (
         <div className="hidden md:grid w-full mt-8 grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-x-12">
@@ -146,7 +149,7 @@ export default function Home({ recentlyAdded, featuredPodcasts }) {
       )}
       <div className="my-9 grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-x-12">
         <div className="xl:col-span-3 lg:col-span-2 md:col-span-1 mb-9">
-          {Object.keys(secondaryData_).length > 0 ? (
+          {Object.keys(primaryData_).length > 0 ? (
             <RecentlyAdded />
           ) : (
             <Loading />

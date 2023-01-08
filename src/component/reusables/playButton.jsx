@@ -3,7 +3,7 @@ import { appContext } from '../../utils/initStateGen';
 import { getButtonRGBs } from '../../utils/ui';
 import { PlayIcon, PauseIcon } from '@heroicons/react/24/outline';
 import { useRecoilState } from 'recoil';
-import { primaryData, secondaryData, switchFocus, videoSelection } from '../../atoms';
+import { currentAudio, primaryData, secondaryData, switchFocus, videoSelection } from '../../atoms';
 
 
 export default function PlayButton({episode, episodeNumber="1", color=""}) {
@@ -26,11 +26,14 @@ export default function PlayButton({episode, episodeNumber="1", color=""}) {
   const [primaryData_, setPrimaryData_] = useRecoilState(primaryData);
   const [secondaryData_, setSecondaryData_] = useRecoilState(secondaryData);
   const [vs_, setVS_] = useRecoilState(videoSelection);
+  const [ca_, setCA_] = useRecoilState(currentAudio); // Current Audio Object
 
   return (
     <div onClick={() => 
       {if(switchFocus_){
           appState.queue.playEpisode(episode, episode.eid)
+          // appState.queue.pau
+          setCA_([episode.eid, 'playing'])
       }else{
           setVS_(['https://arweave.net/'+episode.contentTx, {}])
         }

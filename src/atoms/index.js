@@ -10,6 +10,11 @@ export const videoSelection = atom({
     default: ['', {}],
 });
 
+export const currentAudio = atom({
+    key: 'currentAudio',
+    default: ['', 'stopped'],
+});
+
 export const switchFocus = atom({
     key: 'switchFocus',
     default: true,

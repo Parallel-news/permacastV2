@@ -51,7 +51,7 @@ export default function VideoModal() {
             class="video-js"
             controls
             preload="auto"
-            poster={vs_[1].cover}
+            poster={Object.entries(vs_[1]).length < 1 ? 'https://ih1.redbubble.net/image.2647292310.1736/st,small,845x845-pad,1000x1000,f8f8f8.jpg' : vs_[1].cover}
             data-setup="{}"
             className="rounded-[4px] w-[700px]"
           >

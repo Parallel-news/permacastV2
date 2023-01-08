@@ -12,7 +12,7 @@ import {
 import { getCreator } from "../utils/podcast.js";
 import { Cooyub, PlayButton, GlobalPlayButton } from "./reusables/icons";
 import { EyeIcon } from "@heroicons/react/24/outline";
-import { FaPlay } from "react-icons/fa";
+import { FaPause, FaPlay } from "react-icons/fa";
 import { FiEye } from "react-icons/fi";
 
 import Track from "./track";
@@ -20,6 +20,7 @@ import { getButtonRGBs } from "../utils/ui";
 
 import { useRecoilState } from "recoil";
 import {
+  currentAudio,
   primaryData,
   secondaryData,
   switchFocus,
@@ -57,6 +58,7 @@ export function FeaturedEpisode() {
   const [primaryData_, setPrimaryData_] = useRecoilState(primaryData); // Global Podcasts Object
   const [secondaryData_, setSecondaryData_] = useRecoilState(secondaryData); // Selected Podcast Object
   const [vs_, setVS_] = useRecoilState(videoSelection); // Selected Podcast Object
+  const [ca_, setCA_] = useRecoilState(currentAudio); // Current Audio Object
   const { t } = useTranslation();
 
   let history = useHistory();
@@ -72,7 +74,19 @@ export function FeaturedEpisode() {
         } else {
           return obj.contentType === "video/";
         }
-      })[0]
+      })[
+
+        0
+
+        // Math.floor(Math.random() * primaryData_.podcasts.filter((obj) => {
+        //   if (switchFocus_) {
+        //     return obj.contentType === "audio/";
+        //   } else {
+        //     return obj.contentType === "video/";
+        //   }
+        // }).length) + 1
+
+      ]
     );
   }, [switchFocus_]);
   return (
@@ -105,7 +119,7 @@ export function FeaturedEpisode() {
       <div className="ml-auto">
         <>
           <div
-            className="min-w-min btn btn-primary border-0 mt-5 rounded-full flex items-center cursor-pointer backdrop-blur-md"
+            className="min-w-min btn btn-secondary border-0 mt-5 rounded-full flex items-center cursor-pointer backdrop-blur-md"
             // style={getButtonRGBs(rgb)}
             onClick={() => {
               if (switchFocus_) {
@@ -113,6 +127,7 @@ export function FeaturedEpisode() {
                   secondaryData_.episodes[0],
                   secondaryData_.episodes[0].eid
                 );
+                setCA_([secondaryData_.episodes[0].eid, 'playing'])
               } else {
                 setVS_([
                   "https://arweave.net/" + secondaryData_.episodes[0].contentTx,
@@ -121,11 +136,15 @@ export function FeaturedEpisode() {
               }
             }}
           >
-            <FaPlay className="w-3 h-3" />
-            <div className="ml-2">{t("home.playfeaturedepisode")}</div>
+            { ca_[0] === secondaryData_.episodes[0].eid ?
+              <FaPause className="w-3 h-3" />
+              :
+              <FaPlay className="w-3 h-3" />
+            }
+            <div className="ml-2">{t(ca_[0] === secondaryData_.episodes[0].eid ? "home.pausefeaturedepisode" : "home.playfeaturedepisode")}</div>
           </div>
           <div
-            className="min-w-min btn btn-primary border-0 mt-5 rounded-full flex items-center cursor-pointer backdrop-blur-md"
+            className="min-w-min btn btn-secondary border-0 mt-5 rounded-full flex items-center cursor-pointer backdrop-blur-md"
             // style={getButtonRGBs(rgb)}
             onClick={() => {
               history.push(
@@ -166,7 +185,8 @@ export function FeaturedPodcast({ podcast }) {
   const [vs_, setVS_] = useRecoilState(videoSelection);
   const [primaryData_, setPrimaryData_] = useRecoilState(primaryData); // Global Podcasts Object
   const [secondaryData_, setSecondaryData_] = useRecoilState(secondaryData); // Selected Podcast Object
-  const [colorData_, setColorData_] = useState([]); // Selected Podcast Object
+  const [colorData_, setColorData_] = useState([]); 
+  const [ca_, setCA_] = useRecoilState(currentAudio); // Current Audio Object
 
   return (
     <>
@@ -206,6 +226,7 @@ export function FeaturedPodcast({ podcast }) {
                     secondaryData_.episodes[0],
                     secondaryData_.episodes[0].eid
                   );
+                  setCA_([secondaryData_.episodes[0].eid, 'playing'])
                 } else {
                   setVS_([
                     "https://arweave.net/" +
@@ -215,11 +236,18 @@ export function FeaturedPodcast({ podcast }) {
                 }
               }}
             >
-              <GlobalPlayButton
+              {/* <GlobalPlayButton
                 size="20"
                 innerColor={"black"}
                 outerColor={textColor}
-              />
+              /> */}
+              <div className={`text-black/80 bg-white/50 rounded-[50%] w-[40px] h-[40px] flex flex-col justify-center items-center`}>
+              { ca_[0] === secondaryData_.episodes[0].eid ?
+              <FaPause className="w-4 h-4" />
+              :
+              <FaPlay className="w-4 h-4" />
+            }
+              </div>
             </div>
             <div
               className="ml-3"
@@ -249,7 +277,10 @@ export function FeaturedPodcastsMobile() {
     } else {
       return obj.contentType === "video/";
     }
-  });
+  }).filter((obj__) => {
+    return obj__.episodes.length > 0
+  })
+
   return (
     <div className="carousel">
       {podcasts.map((podcast, index) => (
@@ -286,9 +317,12 @@ export function RecentlyAdded() {
       } else {
         return obj.contentType === "video/";
       }
+    }).filter((obj_) => {
+      return obj_.episodes.length > 0
     });
     data_.forEach((obj) => {
-      setEpisodes(episodes.concat(obj.episodes));
+      const x_ = obj.episodes
+      setEpisodes(episodes.concat(x_));
     });
   }, []);
   return (
