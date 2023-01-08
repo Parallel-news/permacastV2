@@ -311,39 +311,41 @@ export default function UploadPodcastView() {
     handler(showObj);
   };
 
-  const handleShowUpload = async (event) => {
-    event.preventDefault();
-    // extract attrs from form
-    const showObj = {};
-    const podcastName = event.target.podcastName.value;
-    const podcastDescription = event.target.podcastDescription.value;
-    const podcastCover = event.target.podcastCover.files[0];
-    const podcastAuthor = event.target.podcastAuthor.value;
-    const podcastEmail = event.target.podcastEmail.value;
-    const podcastCategory = event.target.podcastCategory.value;
-    const podcastExplicit = event.target.podcastExplicit.checked ? "yes" : "no";
-    const podcastLanguage = event.target.podcastLanguage.value;
-    const coverFileType = podcastCover.type;
-    // add attrs to input for SWC
-    showObj.name = podcastName;
-    showObj.desc = podcastDescription;
-    showObj.author = podcastAuthor;
-    showObj.email = podcastEmail;
-    showObj.category = podcastCategory;
-    showObj.isExplicit = podcastExplicit;
-    showObj.lang = podcastLanguage;
-    // upload cover, send all to Arweave
-    let cover = await processFile(podcastCover);
-    let showObjSize = JSON.stringify(showObj).length;
-    let bytes = cover.byteLength + showObjSize + coverFileType.length;
-    setIsUploading(true);
-    if ((await userHasEnoughAR(t, bytes, SHOW_UPLOAD_FEE)) === "all good") {
-      await uploadToArweave(cover, coverFileType, showObj);
-    } else {
-      console.log("upload failed");
-      setIsUploading(false);
-    }
-  };
+  // Outdated Upload Function
+  
+  // const handleShowUpload = async (event) => {
+  //   event.preventDefault();
+  //   // extract attrs from form
+  //   const showObj = {};
+  //   const podcastName = event.target.podcastName.value;
+  //   const podcastDescription = event.target.podcastDescription.value;
+  //   const podcastCover = event.target.podcastCover.files[0];
+  //   const podcastAuthor = event.target.podcastAuthor.value;
+  //   const podcastEmail = event.target.podcastEmail.value;
+  //   const podcastCategory = event.target.podcastCategory.value;
+  //   const podcastExplicit = event.target.podcastExplicit.checked ? "yes" : "no";
+  //   const podcastLanguage = event.target.podcastLanguage.value;
+  //   const coverFileType = podcastCover.type;
+  //   // add attrs to input for SWC
+  //   showObj.name = podcastName;
+  //   showObj.desc = podcastDescription;
+  //   showObj.author = podcastAuthor;
+  //   showObj.email = podcastEmail;
+  //   showObj.category = podcastCategory;
+  //   showObj.isExplicit = podcastExplicit;
+  //   showObj.lang = podcastLanguage;
+  //   // upload cover, send all to Arweave
+  //   let cover = await processFile(podcastCover);
+  //   let showObjSize = JSON.stringify(showObj).length;
+  //   let bytes = cover.byteLength + showObjSize + coverFileType.length;
+  //   setIsUploading(true);
+  //   if ((await userHasEnoughAR(t, bytes, SHOW_UPLOAD_FEE)) === "all good") {
+  //     await uploadToArweave(cover, coverFileType, showObj);
+  //   } else {
+  //     console.log("upload failed");
+  //     setIsUploading(false);
+  //   }
+  // };
 
   const languageOptions = () => {
     const langsArray = Object.entries(languages);

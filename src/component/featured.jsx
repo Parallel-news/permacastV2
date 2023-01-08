@@ -74,7 +74,12 @@ export function FeaturedEpisode() {
         } else {
           return obj.contentType === "video/";
         }
-      })[0]
+      }).filter((obj_) => {
+        return obj_.episodes.length > 0
+      })
+      .map(value => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value)[0]
 
       // Math.floor(Math.random() * primaryData_.podcasts.filter((obj) => {
       //   if (switchFocus_) {
@@ -84,7 +89,9 @@ export function FeaturedEpisode() {
       //   }
       // }).length) + 1
     );
+    
   }, [switchFocus_]);
+  
   return (
     <div className="p-14 flex w-full border border-zinc-800 rounded-3xl">
       <img
@@ -367,7 +374,7 @@ export function FeaturedCreators() {
   const loading = appState.otherComponentsLoading.creators;
   const creators = appState.creators;
   const [primaryData_] = useRecoilState(primaryData);
-  const data_ = [];
+  let data_ = [];
   primaryData_.podcasts.forEach((obj) => {
     if (!data_.includes(primaryData_.podcasts.filter((obj_) => {
       return obj_.owner === obj.owner
@@ -375,7 +382,10 @@ export function FeaturedCreators() {
       data_.push(obj);
     }
   });
-  console.log(data_);
+  data_ = data_
+  .map(value => ({ value, sort: Math.random() }))
+.sort((a, b) => a.sort - b.sort)
+.map(({ value }) => value)
   return (
     <div>
       <h2 className="text-zinc-400 mb-4">{t("home.featuredcreators")}</h2>
