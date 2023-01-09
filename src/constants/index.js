@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export const PODCAST_NAME_MIN_LEN = 2;
 export const PODCAST_NAME_MAX_LEN = 500;
 
@@ -24,5 +26,4 @@ export const PODCAST_COVER_MAX_LEN = 43;
 
 export const IS_EXPLICIT_VALUES = ["yes", "no"];
 export const CONTENT_TYPE_VALUES = ["v", "a"];
-
 

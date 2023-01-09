@@ -35,7 +35,7 @@ import { useRecoilState } from "recoil";
 // visible: true
 // }]
 
-export default function Home({ recentlyAdded, featuredPodcasts }) {
+export default function Home() {
   const appState = useContext(appContext);
 
   const [switchFocus_, setSwitchFocus_] = useRecoilState(switchFocus);

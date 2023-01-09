@@ -33,7 +33,6 @@ export function Sidenav() {
     i18n.changeLanguage(lng);
   };
 
-  const appState = useContext(appContext);
   const [contentType_, setContentType_] = useRecoilState(ContentType)
   const [showUploadOptions,setUploadOptions] = useState(false)
   const switchView = (i) => {
@@ -139,7 +138,6 @@ export function Sidenav() {
 
 export function NavBar() {
   const appState = useContext(appContext);
-
   return (
     <>
       <div className="md:hidden">

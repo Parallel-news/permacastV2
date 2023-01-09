@@ -14,18 +14,19 @@ import Episode from './pages/episode.jsx';
 import Show from './pages/show.jsx';
 import Creator from './pages/creator.jsx';
 import Home from './pages/home.jsx';
-import { fetchPodcastTitles, convertToEpisode, convertToPodcast, convertSearchItem, sortPodcasts, getPodcasts, getCreator } from './utils/podcast.js';
+import { getCreator, fetchPodcastTitles, convertSearchItem } from './utils/podcast.js';
 import { appContext } from './utils/initStateGen.js';
 import { MESON_ENDPOINT } from './utils/arweave.js';
-import { RecoilRoot, useRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import VideoModal from './component/video_modal.jsx';
 import { isFullscreen, primaryData } from './atoms/index.js';
 import { getAllData } from "../src/services/services";
+import { cacheTitles } from './utils/titles.js';
 
 export default function App() {
   const { t } = useTranslation();
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [appLoaded, setAppLoaded] = useState(false);
   const [selection, setSelection] = useState(0);
 
@@ -36,7 +37,6 @@ export default function App() {
   const [player, setPlayer] = useState();
   const [isPaused, setIsPaused] = useState();
   const [currentEpisode, setCurrentEpisode] = useState({ contentTx: 'null', pid: 'null', eid: 'null', number: '1' });
-  const [allPodcasts, setAllPodcasts] = useState();
 
   const [themeColor, setThemeColor] = useState('rgb(255, 255, 0)');
   const [currentPodcastColor, setCurrentPodcastColor] = useState('rgb(255, 255, 0)');
@@ -84,20 +84,13 @@ export default function App() {
     "lIg5mdDMAAIj5Pn2BSYKI8SEo8hRIdh-Zrn_LSy_3Qg"
   ]
 
-  const [recentlyAdded, setRecentlyAdded] = useState([]);
-  const [featuredPodcasts, setFeaturedPodcasts] = useState();
-  const [featuredVideoShows, setFeaturedVideoShows] = useState();
   const [searchInput, setSearchInput] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const [titlesLoading, setTitlesLoading] = useState(true);
   const [titles, setTitles] = useState([]);
 
-  const filters = [
-    { type: "episodescount", desc: t("sorting.episodescount") },
-    { type: "podcastsactivity", desc: t("sorting.podcastsactivity") }
-  ];
-  const filterTypes = filters.map(f => f.type)
+
 
   // const changeSorting = (n) => {
   //   setPodcasts(podcasts[filterTypes[n]])
@@ -105,6 +98,7 @@ export default function App() {
   // }
 
   // TODO: generalize
+  /*
   const cacheTitles = async () => {
     if (Date.parse(localStorage.getItem("checkupDate")) <= new Date()) {
       const oldDateObj = new Date();
@@ -124,39 +118,50 @@ export default function App() {
           localStorage.setItem("titles", JSON.stringify(titles))
         })
       }
-      // console.log("using cached data")
+
     }
   }
+  */
+  
 
-  // page load
+  // TARGET page load
   useEffect(() => {
     // TODO: generalize
     if (!localStorage.getItem("checkupDate")) localStorage.setItem("checkupDate", new Date());
     playEpisode(null);
     const fetchData = async () => {
-      setLoading(true)
-      let sorted = [];
-      // if (Date.parse(localStorage.getItem("checkupDate")) <= new Date()) {
-      // console.log('fetching new data')
-      const sortedPodcasts = await sortPodcasts(filterTypes);
-      sorted = sortedPodcasts[filterTypes[selection]];
+
+      //Seb Additions
+      //let sorted = [];
+      //sorted = sortedPodcasts[filterTypes[selection]];
       // localStorage.setItem("sortedPodcasts", JSON.stringify(sorted))
-      setAllPodcasts(sortedPodcasts);
-      const podcasts = sorted.splice(0, 9);
+      
+
+      //Seb Additions
+      //const podcasts = sorted.splice(0, 9);
       // const recentPodcasts = sorted.splice(0, 9)
-      const convertedPodcasts = await Promise.all(podcasts.map(p => convertToPodcast(p)));
-      const convertedEpisodes = await Promise.all(podcasts.splice(0, 3).map(p => convertToEpisode(p, p.episodes[0])));
+
+      //Seb Additions
+      //const convertedPodcasts = await Promise.all(podcasts.map(p => convertToPodcast(p)));
+      //const convertedEpisodes = await Promise.all(podcasts.splice(0, 3).map(p => convertToEpisode(p, p.episodes[0])));
       // setCurrentEpisode(convertedEpisodes[0])
-      setRecentlyAdded(convertedEpisodes);
-      setFeaturedPodcasts(convertedPodcasts);
+
+      //Seb Additions
+      //setRecentlyAdded(convertedEpisodes);
+      //setFeaturedPodcasts(convertedPodcasts);
+
       // console.log(convertedPodcasts[0])
       // setFeaturedVideoShows(convertedVideoShows)
       // setSortedPodcasts(sorted)
       // setPodcasts(sorted[filterTypes[selection]])
-      setLoading(false);
 
       setTitlesLoading(true);
-      cacheTitles();
+      const cached = await cacheTitles();
+      console.log("cached: ", cached);
+      setTitles(cached);
+      //const cachedTitles = await cacheTitles();
+      //console.log("cacheTitles(): ", cachedTitles);
+      //setTitles(cachedTitles);
       setTitlesLoading(false);
 
       setCreatorsLoading(true);
@@ -182,7 +187,6 @@ export default function App() {
     t: t,
     creators: creators,
     loading: loading,
-    allPodcasts: allPodcasts,
     otherComponentsLoading: {
       titles: titlesLoading,
       creators: creatorsLoading
@@ -291,6 +295,7 @@ export default function App() {
           <Router>
             <div className="flex h-screen">
               <div className="fixed z-[60] bottom-0 w-full">
+                {/*Once purpose resolved, state var here needs to be localized*/}
                 <div className={`relative podcast-player rounded-t-xl backdrop-blur-sm ${isFullscreen_ ? "bg-zinc-900/60" : "bg-zinc-900"}`}>
                   {/* {!loading && currentEpisode ? <Player episode={currentEpisode} />: <div>Loading...</div>} */}
                 </div>
@@ -316,7 +321,7 @@ export default function App() {
                     <Route
                       exact
                       path="/"
-                      component={({ match }) => <Home recentlyAdded={recentlyAdded} featuredPodcasts={featuredPodcasts} />}
+                      component={({ match }) => <Home />}
                     />
                     <Route
                       exact

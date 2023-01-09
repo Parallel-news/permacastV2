@@ -317,9 +317,9 @@ export function FeaturedPodcastsMobile() {
 
 export function RecentlyAdded() {
   const { t } = useTranslation();
-  const [switchFocus_, setSwitchFocus_] = useRecoilState(switchFocus);
-  const [primaryData_, setPrimaryData_] = useRecoilState(primaryData);
-  const [secondaryData_, setSecondaryData_] = useRecoilState(secondaryData);
+  const [switchFocus_, ] = useRecoilState(switchFocus);
+  const [primaryData_, ] = useRecoilState(primaryData);
+
   const [episodes, setEpisodes] = useState([]);
   const createdAt_ = (a, b) => {
     if (a.uploadedAt < b.uploadedAt) {
