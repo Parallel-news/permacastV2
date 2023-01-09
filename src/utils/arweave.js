@@ -1,7 +1,6 @@
 import ArweaveMultihost from "arweave-multihost";
 import Arweave from "arweave";
 import ArDB from 'ardb';
-import { SmartWeaveWebFactory } from "redstone-smartweave";
 import { generateFactoryState } from "./initStateGen";
 
 export const arweave = Arweave.init({
@@ -12,8 +11,6 @@ export const arweave = Arweave.init({
 });
 
 const ardb = new ArDB(arweave);
-
-export const smartweave = SmartWeaveWebFactory.memCached(arweave);
 
 // TEST CONTRACT:
 //export const CONTRACT_SRC = "4uc2tYgjq75xb3Bc5vMZej-7INXxhaTA70NPL23Om4A"

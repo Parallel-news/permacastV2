@@ -1,6 +1,6 @@
 import ArDB from 'ardb'
 import Swal from 'sweetalert2'
-import { CONTRACT_SRC, NFT_SRC, FEE_MULTIPLIER, arweave, smartweave } from '../utils/arweave.js'
+import { CONTRACT_SRC, NFT_SRC, FEE_MULTIPLIER, arweave } from '../utils/arweave.js'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -21,7 +21,7 @@ export default function UploadEpisode({ podcast }) {
       "id": episodeId,
       "type": "art"
     };
-    const contract = smartweave.contract(vertoContractId).connect('use_wallet');
+    // const contract = smartweave.contract(vertoContractId).connect('use_wallet');
     await contract.writeInteraction(input);
   }
 
