@@ -4,7 +4,7 @@ import Swal from 'sweetalert2'
 import { shortenAddress } from '../utils/ui'
 import { appContext } from '../utils/initStateGen'
 
-const requiredPermissions = ['ACCESS_ADDRESS', 'ACCESS_ALL_ADDRESSES', 'SIGNATURE', 'SIGN_TRANSACTION']
+const requiredPermissions = ['ACCESS_ADDRESS', 'ACCESS_ALL_ADDRESSES', 'SIGNATURE', 'SIGN_TRANSACTION', 'ACCESS_PUBLIC_KEY']
 
 
 export default function ArConnect() {
@@ -14,6 +14,7 @@ export default function ArConnect() {
   
   useEffect(() => {
     // add ArConnect event listeners
+    console.log("arconnect.jsx useEffect");
     window.addEventListener('arweaveWalletLoaded', walletLoadedEvent)
     window.addEventListener('walletSwitch', walletSwitchEvent)
     return () => {
@@ -69,6 +70,7 @@ export default function ArConnect() {
   // }
 
   useEffect(() => {
+    console.log("arconnect.jsx fetch useEffect");
     const fetchData = async () => {
       if (address) {
         try {

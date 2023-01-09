@@ -1,9 +1,12 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { appContext } from '../utils/initStateGen';
 import Track from '../component/track';
 import { useTranslation } from 'react-i18next';
+import { useRecoilState } from 'recoil';
+import { sortPodcasts } from '../utils/podcast';
+import { allPodcasts, titles } from '../atoms';
 
 export function Searchbar() {
   const appState = useContext(appContext);
@@ -35,15 +38,32 @@ export function Searchbar() {
 export default function Search() {
   const appState = useContext(appContext);
   const { input, titles } = appState.search;
-  const { allPodcasts } = appState;
+  const [ _allPodcasts, _setAllPodcasts ] = useRecoilState(allPodcasts);
+  const [ loaded, setLoaded ] = useState(false);
+  const [ error, setError ] = useState();
   const loading = appState.otherComponentsLoading.titles;
-  const { t } = useTranslation();
-
+  
   const filteredPodcasts = titles.filter((p) => {
     if (input === '') return;
     if (p.type === "eid") return;
     else return p.title.toLowerCase().includes(input.toLowerCase());
   })
+  // Fetch Podcast Data
+  const { t } = useTranslation();
+  useEffect(() => {
+    async function fetchData() {
+      const filters = [
+        { type: "episodescount", desc: t("sorting.episodescount") },
+        { type: "podcastsactivity", desc: t("sorting.podcastsactivity") }
+      ];
+      const filterTypes = filters.map(f => f.type);
+      const sortedPodcasts = await sortPodcasts(filterTypes);  
+      _setAllPodcasts(sortedPodcasts);
+    }
+    if(!loaded) {
+      fetchData().then(() => setLoaded(true)).catch((e) => setError(e));
+    }
+  }, [])
   // console.log(filteredPodcasts);
   // TODO: add podcastId to episodes
   // const filteredEpisodes = titles.filter((p) => {
