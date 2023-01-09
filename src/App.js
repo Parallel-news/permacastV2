@@ -5,7 +5,6 @@ import { HashRouter as Router, Route } from 'react-router-dom';
 import { Sidenav, NavBar } from './component/navbars.jsx';
 import Background from './component/background.jsx';
 import Search from "./pages/search.jsx";
-import ArConnect from './component/arconnect.jsx';
 import EpisodeQueue from './component/episode_queue.jsx';
 import Fullscreen from './component/fullscreen.jsx';
 import UploadPodcastView from './pages/uploadPodcast.jsx';
@@ -14,7 +13,7 @@ import Episode from './pages/episode.jsx';
 import Show from './pages/show.jsx';
 import Creator from './pages/creator.jsx';
 import Home from './pages/home.jsx';
-import { getCreator, fetchPodcastTitles, convertSearchItem } from './utils/podcast.js';
+import { getCreator } from './utils/podcast.js';
 import { appContext } from './utils/initStateGen.js';
 import { MESON_ENDPOINT } from './utils/arweave.js';
 import { useRecoilState } from 'recoil';
@@ -90,39 +89,6 @@ export default function App() {
   const [titlesLoading, setTitlesLoading] = useState(true);
   const [titles, setTitles] = useState([]);
 
-
-
-  // const changeSorting = (n) => {
-  //   setPodcasts(podcasts[filterTypes[n]])
-  //   setSelection(n)
-  // }
-
-  // TODO: generalize
-  /*
-  const cacheTitles = async () => {
-    if (Date.parse(localStorage.getItem("checkupDate")) <= new Date()) {
-      const oldDateObj = new Date();
-      const newDateObj = new Date();
-      newDateObj.setTime(oldDateObj.getTime() + (20 * 60 * 1000)); // 20 minutes
-      localStorage.setItem("checkupDate", newDateObj)
-      Promise.all((await fetchPodcastTitles()).map(p => convertSearchItem(p))).then(titles => {
-        setTitles(titles)
-        localStorage.setItem("titles", JSON.stringify(titles))
-      })
-    } else {
-      if (localStorage.getItem("titles")) {
-        setTitles(JSON.parse(localStorage.getItem("titles")))
-      } else {
-        Promise.all((await fetchPodcastTitles()).map(p => convertSearchItem(p))).then(titles => {
-          setTitles(titles)
-          localStorage.setItem("titles", JSON.stringify(titles))
-        })
-      }
-
-    }
-  }
-  */
-  
 
   // TARGET page load
   useEffect(() => {

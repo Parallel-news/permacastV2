@@ -52,7 +52,7 @@ import {
 import { useLocation, useHistory } from "react-router-dom";
 
 export default function Podcast(props) {
-  const { t } = useTranslation();
+  const { t } = useTranslation(); 
   const appState = useContext(appContext);
   const { address, setAddress } = appState.user;
   const [loading, setLoading] = useState(true);
@@ -244,7 +244,7 @@ export default function Podcast(props) {
           <p class="vjs-no-js">
             To view this video please enable JavaScript, and consider upgrading
             to a web browser that
-            <a href="https://videojs.com/html5-video-support/" target="_blank">
+            <a href="https://videojs.com/html5-video-support/" target="_blank" rel="noreferrer">
               supports HTML5 video
             </a>
           </p>
