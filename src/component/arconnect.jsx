@@ -116,7 +116,7 @@ export default function ArConnect() {
               className="flex px-3 justify-center mx-auto text-sm md:text-base normal-case"
               onClick={arconnectDisconnect}
             >
-              <span>
+              <span className={`mr-1`}>
                 {ANSData?.currentLabel ? `${ANSData?.currentLabel}.ar` : shortenAddress(address)}
               </span>
               {
