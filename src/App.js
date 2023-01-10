@@ -13,21 +13,18 @@ import Episode from './pages/episode.jsx';
 import Show from './pages/show.jsx';
 import Creator from './pages/creator.jsx';
 import Home from './pages/home.jsx';
-import { getCreator } from './utils/podcast.js';
 import { appContext } from './utils/initStateGen.js';
 import { MESON_ENDPOINT } from './utils/arweave.js';
 import { useRecoilState } from 'recoil';
 import VideoModal from './component/video_modal.jsx';
 import { isFullscreen, primaryData } from './atoms/index.js';
 import { getAllData } from "../src/services/services";
-import { cacheTitles } from './utils/titles.js';
 
 export default function App() {
   const { t } = useTranslation();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, ] = useState(false);
   const [appLoaded, setAppLoaded] = useState(false);
-  const [selection, setSelection] = useState(0);
 
   const [primaryData_, setPrimaryData_] = useRecoilState(primaryData)
 
@@ -37,30 +34,33 @@ export default function App() {
   const [isPaused, setIsPaused] = useState();
   const [currentEpisode, setCurrentEpisode] = useState({ contentTx: 'null', pid: 'null', eid: 'null', number: '1' });
 
-  const [themeColor, setThemeColor] = useState('rgb(255, 255, 0)');
+  const [themeColor, ] = useState('rgb(255, 255, 0)');
   const [currentPodcastColor, setCurrentPodcastColor] = useState('rgb(255, 255, 0)');
-  const [backdropColor, setBackdropColor] = useState();
+  const [backdropColor, ] = useState();
 
   const [address, setAddress] = useState();
   const [ANSData, setANSData] = useState({ address_color: "", currentLabel: "", avatar: "" });
   const [walletConnected, setWalletConnected] = useState(false);
-
-  // const [podcasts, setPodcasts] = useState();
-  // const [sortedPodcasts, setSortedPodcasts] = useState();
   const [queue, setQueue] = useState([]);
   const [queueVisible, setQueueVisible] = useState(false);
 
   // for the queue button
   useEffect(() => {
-    console.log("Use effect player");
     const abortContr = new AbortController();
+    if (!localStorage.getItem("checkupDate")) localStorage.setItem("checkupDate", new Date());
+    playEpisode(null);
+
     try {
       getAllData({signal: abortContr.signal}).then((data) => setPrimaryData_(data));
     } catch(e) {
       console.log("Error fetching read data from App.js");
       console.log(e);
     }
-      
+    console.log("--Use effect player BEFORE");
+    if (!appLoaded) {
+      setAppLoaded(true);
+      console.log("--Use effect appLoaded");
+    }
     if (!player) return;
     const queue = player.ui.queueBtn;
     const paused = player.ui.playBtn;
@@ -69,79 +69,16 @@ export default function App() {
     queue.addEventListener('click', () => setQueueVisible(visible => !visible));
     paused.addEventListener('click', () => setIsPaused(paused => !paused));
     fullscreen.addEventListener('click', () => setIsFullscreen_(isFullscreen_ => !isFullscreen_));
+
+
+    console.log("--Use effect player");
     return () => {
       abortContr.abort()
     }
   }, [player]);
 
-  const [creatorsLoading, setCreatorsLoading] = useState(true)
-  const [creators, setCreators] = useState([]);
-
-  const veryGoodWhitelistOfVeryGoodPeople = [
-    "kaYP9bJtpqON8Kyy3RbqnqdtDBDUsPTQTNUCvZtKiFI",
-    "vZY2XY1RD9HIfWi8ift-1_DnHLDadZMWrufSh-_rKF0",
-    "lIg5mdDMAAIj5Pn2BSYKI8SEo8hRIdh-Zrn_LSy_3Qg"
-  ]
-
   const [searchInput, setSearchInput] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
-
-  const [titlesLoading, setTitlesLoading] = useState(true);
-  const [titles, setTitles] = useState([]);
-
-
-  // TARGET page load
-  useEffect(() => {
-    // TODO: generalize
-    if (!localStorage.getItem("checkupDate")) localStorage.setItem("checkupDate", new Date());
-    playEpisode(null);
-    const fetchData = async () => {
-
-      //Seb Additions
-      //let sorted = [];
-      //sorted = sortedPodcasts[filterTypes[selection]];
-      // localStorage.setItem("sortedPodcasts", JSON.stringify(sorted))
-      
-
-      //Seb Additions
-      //const podcasts = sorted.splice(0, 9);
-      // const recentPodcasts = sorted.splice(0, 9)
-
-      //Seb Additions
-      //const convertedPodcasts = await Promise.all(podcasts.map(p => convertToPodcast(p)));
-      //const convertedEpisodes = await Promise.all(podcasts.splice(0, 3).map(p => convertToEpisode(p, p.episodes[0])));
-      // setCurrentEpisode(convertedEpisodes[0])
-
-      //Seb Additions
-      //setRecentlyAdded(convertedEpisodes);
-      //setFeaturedPodcasts(convertedPodcasts);
-
-      // console.log(convertedPodcasts[0])
-      // setFeaturedVideoShows(convertedVideoShows)
-      // setSortedPodcasts(sorted)
-      // setPodcasts(sorted[filterTypes[selection]])
-
-      setTitlesLoading(true);
-      const cached = await cacheTitles();
-      console.log("cached: ", cached);
-      setTitles(cached);
-      //const cachedTitles = await cacheTitles();
-      //console.log("cacheTitles(): ", cachedTitles);
-      //setTitles(cachedTitles);
-      setTitlesLoading(false);
-
-      setCreatorsLoading(true);
-      setCreators(await Promise.all(veryGoodWhitelistOfVeryGoodPeople.map(creatorAddress => getCreator(creatorAddress))));
-      setCreatorsLoading(false);
-      console.log("Use effect fetching");
-    }
-    if (!appLoaded) {
-      fetchData();
-      setAppLoaded(true);
-      console.log("Use effect appLoaded");
-    }
-    console.log("Use effect actioning");
-  }, [appLoaded]);
 
   window.addEventListener('keydown', function (e) {
     if (e.key == " " && e.target == document.body) {
@@ -151,12 +88,7 @@ export default function App() {
 
   const appState = {
     t: t,
-    creators: creators,
     loading: loading,
-    otherComponentsLoading: {
-      titles: titlesLoading,
-      creators: creatorsLoading
-    },
     appLoaded: appLoaded,
     setAppLoaded: setAppLoaded,
     globalModal: {
@@ -172,7 +104,6 @@ export default function App() {
     search: {
       input: searchInput,
       setInput: setSearchInput,
-      titles: titles,
     },
     user: {
       address: address,

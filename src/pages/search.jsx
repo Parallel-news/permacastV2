@@ -7,13 +7,16 @@ import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { sortPodcasts } from '../utils/podcast';
 import { allPodcasts, titles } from '../atoms';
+import { cacheTitles } from '../utils/titles';
+import { input } from '../atoms';
 
 export function Searchbar() {
-  const appState = useContext(appContext);
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
-  const { input, setInput } = appState.search;
+  const [_input, _setInput] = useRecoilState(input);
+
+  //const { input, setInput } = appState.search;
 
   return (
     <div>
@@ -22,9 +25,10 @@ export function Searchbar() {
           <MagnifyingGlassIcon className="h-5 w-5 text-zinc-600" />
         </div>
         <input
-          value={input}
+          type="text"
+          value={_input}
           onChange={(e) => {
-            setInput(e.target.value);
+            _setInput(e.target.value);
             if (!location.pathname.includes("search")) history.push("/search");
           }}
           className="input input-secondary block pl-10 py-2.5 md:py-[14px] text-xs md:text-base w-full placeholder-zinc-600 focus:placeholder-white rounded-lg md:rounded-full bg-zinc-900 text-zinc-100 outline-none focus:ring-2 focus:ring-inset focus:ring-white"
@@ -36,50 +40,59 @@ export function Searchbar() {
 }
 
 export default function Search() {
-  const appState = useContext(appContext);
-  const { input, titles } = appState.search;
+
   const [ _allPodcasts, _setAllPodcasts ] = useRecoilState(allPodcasts);
+  const [ _titles, _setTitles ] = useRecoilState(titles);
   const [ loaded, setLoaded ] = useState(false);
-  const [ error, setError ] = useState();
-  const loading = appState.otherComponentsLoading.titles;
-  
-  const filteredPodcasts = titles.filter((p) => {
-    if (input === '') return;
-    if (p.type === "eid") return;
-    else return p.title.toLowerCase().includes(input.toLowerCase());
-  })
-  // Fetch Podcast Data
+  const [ , setError ] = useState();
+  const [_input, ] = useRecoilState(input);
+
+  const filteredPodcasts = _titles ? 
+    _titles.filter((p) => {
+      if (_input === '') return;
+      if (p.type === "eid") return;
+      else return p.title.toLowerCase().includes(_input.toLowerCase());
+    })
+    :
+    "";
   const { t } = useTranslation();
+
   useEffect(() => {
-    async function fetchData() {
-      const filters = [
-        { type: "episodescount", desc: t("sorting.episodescount") },
-        { type: "podcastsactivity", desc: t("sorting.podcastsactivity") }
-      ];
-      const filterTypes = filters.map(f => f.type);
-      const sortedPodcasts = await sortPodcasts(filterTypes);  
-      _setAllPodcasts(sortedPodcasts);
+    const titlesContr = new AbortController();
+    // Fetch Titles & Cache
+    cacheTitles({signal: titlesContr.signal }).then(cache => _setTitles(cache)).catch((e) => setError(e));
+    console.log("NEW TITLES: ", _titles);
+    
+    // Clean-up
+    return () => {
+      titlesContr.abort();
     }
-    if(!loaded) {
-      fetchData().then(() => setLoaded(true)).catch((e) => setError(e));
+  }, []);
+
+  
+  useEffect(() => {
+    const podcastsContr = new AbortController();
+      // Fetch Podcasts
+    const filters = [
+      { type: "episodescount", desc: t("sorting.episodescount") },
+      { type: "podcastsactivity", desc: t("sorting.podcastsactivity") }
+    ];
+    const filterTypes = filters.map(f => f.type);
+    
+    sortPodcasts(filterTypes, {signal: podcastsContr.signal }).then(sortedPods => _setAllPodcasts(sortedPods)).catch(e => setError(e));  
+    console.log("NEW PODCASTS: ", _allPodcasts);
+
+    return () => {
+      podcastsContr.abort();
     }
-  }, [])
-  // console.log(filteredPodcasts);
-  // TODO: add podcastId to episodes
-  // const filteredEpisodes = titles.filter((p) => {
-  //   if (input === '') return;
-  //   if (p.type === "pid") return;
-  //   else {
-  //     const podcast = allPodcasts.podcastsactivity.find(p => p.episodes.find(e => e.eid === p.eid))
-  //     return p.title.toLowerCase().includes(input.toLowerCase());
-  //   }
-  // })
+  }, []);
+
 
   return (
     <div className="text-white h-full pb-80">
-      {loading ? <div className="text-2xl text-white font-bold mb-6">{t("search.loading")}</div> : (
+      {!loaded ? <div className="text-2xl text-white font-bold mb-6">{t("search.loading")}</div> : (
         <div>
-          {input.length !== 0 ?
+          {_input.length !== 0 ?
             (
               <>
                 <div className="text-2xl text-white font-bold mb-6">{t("search.podcasts")}</div>

@@ -1,5 +1,6 @@
 import { WEBSITE_URL, API_MAP, ANS_TESTNET_MAP, MESON_ENDPOINT } from "./arweave";
 import FastAverageColor from 'fast-average-color';
+import axios from "axios";
 
 export async function getColor (url) {
   const fac = new FastAverageColor();
@@ -113,10 +114,9 @@ export const getPodcast = (podcasts, podcastId) => {
   return podcast;
 };
 
-
-export const fetchPodcastTitles = async () => {
+export const fetchPodcastTitles = async (signalObj) => {
   const json = await (
-    await fetch(API_MAP.mapping)
+    await fetch(API_MAP.mapping, signalObj)
   ).json();
   return json.res;
 };
@@ -128,7 +128,7 @@ export const sortPodcasts = async (filters) => {
   // Basically, this sandwiches all possible filter requests into one
   await Promise.all(filters.map(async (filter) => {
     result[filter] = await fetch(url+filter).then(res => res.json()).then(json => json.res);
-  }))
+  }));
 
   return result;
 };

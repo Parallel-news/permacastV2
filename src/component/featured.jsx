@@ -371,8 +371,6 @@ export function FeaturedCreators() {
   const { themeColor } = appState.theme;
   const bg = themeColor.replace("rgb", "rgba").replace(")", ", 0.1)");
 
-  const loading = appState.otherComponentsLoading.creators;
-  const creators = appState.creators;
   const [primaryData_] = useRecoilState(primaryData);
   let data_ = [];
   primaryData_.podcasts.forEach((obj) => {
@@ -382,10 +380,10 @@ export function FeaturedCreators() {
       data_.push(obj);
     }
   });
-  data_ = data_
-  .map(value => ({ value, sort: Math.random() }))
-.sort((a, b) => a.sort - b.sort)
-.map(({ value }) => value)
+  data_ = data_.map(value => ({ value, sort: Math.random() }))
+               .sort((a, b) => a.sort - b.sort)
+               .map(({ value }) => value)
+
   return (
     <div>
       <h2 className="text-zinc-400 mb-4">{t("home.featuredcreators")}</h2>
@@ -438,7 +436,8 @@ export function FeaturedCreators() {
                 </div>
               </div>
             </div>
-          ))}
+          )
+          )}
         </>
       )}
     </div>
