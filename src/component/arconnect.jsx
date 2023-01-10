@@ -8,19 +8,19 @@ const requiredPermissions = ['ACCESS_ADDRESS', 'ACCESS_ALL_ADDRESSES', 'SIGNATUR
 
 
 export default function ArConnect() {
-  const appState = useContext(appContext)
+  const appState = useContext(appContext);
   const {address, setAddress, ANSData, setANSData, walletConnected, setWalletConnected } = appState.user;
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   
   useEffect(() => {
     // add ArConnect event listeners
     console.log("arconnect.jsx useEffect");
-    window.addEventListener('arweaveWalletLoaded', walletLoadedEvent)
-    window.addEventListener('walletSwitch', walletSwitchEvent)
+    window.addEventListener('arweaveWalletLoaded', walletLoadedEvent);
+    window.addEventListener('walletSwitch', walletSwitchEvent);
     return () => {
       // remove ArConnect event listeners
-      window.removeEventListener('arweaveWalletLoaded', walletLoadedEvent)
-      window.removeEventListener('walletSwitch', walletSwitchEvent)
+      window.removeEventListener('arweaveWalletLoaded', walletLoadedEvent);
+      window.removeEventListener('walletSwitch', walletSwitchEvent);
     }
   })
 
@@ -62,7 +62,7 @@ export default function ArConnect() {
     })
   }
 
-  const getAddr = () => window.arweaveWallet.getActiveAddress()
+  const getAddr = () => window.arweaveWallet.getActiveAddress();
 
   // const getANSLabel = async (addr) => {
 

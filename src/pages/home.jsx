@@ -7,7 +7,6 @@ import {
   RecentlyAdded,
   FeaturedCreators,
 } from "../component/featured";
-import handler, { getAllData } from "../services/services";
 import { primaryData, secondaryData, switchFocus } from "../atoms/index.js";
 import { useRecoilState } from "recoil";
 
@@ -96,7 +95,6 @@ export default function Home() {
                   (obj) => obj.contentType === "audio/"
                 )
               );
-              // handler({x: 'req'})
             }}
           >
             <p className={`m-2 text-black/80 font-medium text-[13px]`}>

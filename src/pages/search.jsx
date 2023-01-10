@@ -11,7 +11,6 @@ import { cacheTitles } from '../utils/titles';
 import { input } from '../atoms';
 
 export function Searchbar() {
-  const appState = useContext(appContext);
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
@@ -45,8 +44,9 @@ export default function Search() {
   const [ _allPodcasts, _setAllPodcasts ] = useRecoilState(allPodcasts);
   const [ _titles, _setTitles ] = useRecoilState(titles);
   const [ loaded, setLoaded ] = useState(false);
-  const [ error, setError ] = useState();
+  const [ , setError ] = useState();
   const [_input, ] = useRecoilState(input);
+
   const filteredPodcasts = _titles ? 
     _titles.filter((p) => {
       if (_input === '') return;
@@ -55,33 +55,38 @@ export default function Search() {
     })
     :
     "";
-  // Fetch Podcast Data
   const { t } = useTranslation();
-  const abortContr = new AbortController();
+
   useEffect(() => {
-    async function fetchData() {
-      // Fetch Podcasts
-      const filters = [
-        { type: "episodescount", desc: t("sorting.episodescount") },
-        { type: "podcastsactivity", desc: t("sorting.podcastsactivity") }
-      ];
-      const filterTypes = filters.map(f => f.type);
-      const sortedPodcasts = await sortPodcasts(filterTypes, {signal: abortContr.signal});  
-      _setAllPodcasts(sortedPodcasts);
-
-      // Fetch Titles & Cache
-      const cached = await cacheTitles({signal: abortContr.signal});
-      _setTitles(cached);
-    }
+    const titlesContr = new AbortController();
+    // Fetch Titles & Cache
+    cacheTitles({signal: titlesContr.signal }).then(cache => _setTitles(cache)).catch((e) => setError(e));
+    console.log("NEW TITLES: ", _titles);
     
-    if(!loaded) {
-      fetchData().then(() => setLoaded(true)).catch((e) => setError(e));
-    }
-
     // Clean-up
-    return () => abortContr.abort();
-      
+    return () => {
+      titlesContr.abort();
+    }
   }, []);
+
+  
+  useEffect(() => {
+    const podcastsContr = new AbortController();
+      // Fetch Podcasts
+    const filters = [
+      { type: "episodescount", desc: t("sorting.episodescount") },
+      { type: "podcastsactivity", desc: t("sorting.podcastsactivity") }
+    ];
+    const filterTypes = filters.map(f => f.type);
+    
+    sortPodcasts(filterTypes, {signal: podcastsContr.signal }).then(sortedPods => _setAllPodcasts(sortedPods)).catch(e => setError(e));  
+    console.log("NEW PODCASTS: ", _allPodcasts);
+
+    return () => {
+      podcastsContr.abort();
+    }
+  }, []);
+
 
   return (
     <div className="text-white h-full pb-80">
