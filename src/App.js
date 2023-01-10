@@ -86,9 +86,8 @@ export default function App() {
   const [searchInput, setSearchInput] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  const [titlesLoading, setTitlesLoading] = useState(true);
+  const [titlesLoading, setTitlesLoading] = useState(false);
   const [titles, setTitles] = useState([]);
-
 
   // TARGET page load
   useEffect(() => {
@@ -121,14 +120,14 @@ export default function App() {
       // setSortedPodcasts(sorted)
       // setPodcasts(sorted[filterTypes[selection]])
 
+      /*
       setTitlesLoading(true);
       const cached = await cacheTitles();
       console.log("cached: ", cached);
       setTitles(cached);
-      //const cachedTitles = await cacheTitles();
-      //console.log("cacheTitles(): ", cachedTitles);
-      //setTitles(cachedTitles);
+
       setTitlesLoading(false);
+      */
 
       setCreatorsLoading(true);
       setCreators(await Promise.all(veryGoodWhitelistOfVeryGoodPeople.map(creatorAddress => getCreator(creatorAddress))));

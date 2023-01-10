@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
 import { sortPodcasts } from '../utils/podcast';
 import { allPodcasts, titles } from '../atoms';
+import { cacheTitles } from '../utils/titles';
 
 export function Searchbar() {
   const appState = useContext(appContext);
@@ -37,47 +38,55 @@ export function Searchbar() {
 
 export default function Search() {
   const appState = useContext(appContext);
-  const { input, titles } = appState.search;
+  const { input } = appState.search;
   const [ _allPodcasts, _setAllPodcasts ] = useRecoilState(allPodcasts);
+  const [ _titles, _setTitles ] = useRecoilState(titles);
   const [ loaded, setLoaded ] = useState(false);
   const [ error, setError ] = useState();
   const loading = appState.otherComponentsLoading.titles;
   
-  const filteredPodcasts = titles.filter((p) => {
-    if (input === '') return;
-    if (p.type === "eid") return;
-    else return p.title.toLowerCase().includes(input.toLowerCase());
-  })
+  const filteredPodcasts = _titles ? 
+    _titles.filter((p) => {
+      if (input === '') return;
+      if (p.type === "eid") return;
+      else return p.title.toLowerCase().includes(input.toLowerCase());
+    })
+    :
+    "";
   // Fetch Podcast Data
   const { t } = useTranslation();
+  const abortContr = new AbortController();
   useEffect(() => {
     async function fetchData() {
+
+      // Fetch Podcasts
       const filters = [
         { type: "episodescount", desc: t("sorting.episodescount") },
         { type: "podcastsactivity", desc: t("sorting.podcastsactivity") }
       ];
       const filterTypes = filters.map(f => f.type);
-      const sortedPodcasts = await sortPodcasts(filterTypes);  
+      const sortedPodcasts = await sortPodcasts(filterTypes, {signal: abortContr.signal});  
       _setAllPodcasts(sortedPodcasts);
+
+      // Fetch Titles & Cache
+      const cached = await cacheTitles({signal: abortContr.signal});
+      _setTitles(cached);
+      console.log("TITLE FROM RECOIL: ", _titles);
+
     }
+    
     if(!loaded) {
       fetchData().then(() => setLoaded(true)).catch((e) => setError(e));
     }
-  }, [])
-  // console.log(filteredPodcasts);
-  // TODO: add podcastId to episodes
-  // const filteredEpisodes = titles.filter((p) => {
-  //   if (input === '') return;
-  //   if (p.type === "pid") return;
-  //   else {
-  //     const podcast = allPodcasts.podcastsactivity.find(p => p.episodes.find(e => e.eid === p.eid))
-  //     return p.title.toLowerCase().includes(input.toLowerCase());
-  //   }
-  // })
+
+    // Clean-up
+    return () => abortContr.abort();
+      
+  }, []);
 
   return (
     <div className="text-white h-full pb-80">
-      {loading ? <div className="text-2xl text-white font-bold mb-6">{t("search.loading")}</div> : (
+      {!loaded ? <div className="text-2xl text-white font-bold mb-6">{t("search.loading")}</div> : (
         <div>
           {input.length !== 0 ?
             (
