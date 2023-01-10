@@ -49,3 +49,8 @@ export const allPodcasts = atom({
     key: "allPodcasts",
     default: [],
 });
+
+export const input = atom({
+    key: "input",
+    default: ""
+});

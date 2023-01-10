@@ -8,13 +8,16 @@ import { useRecoilState } from 'recoil';
 import { sortPodcasts } from '../utils/podcast';
 import { allPodcasts, titles } from '../atoms';
 import { cacheTitles } from '../utils/titles';
+import { input } from '../atoms';
 
 export function Searchbar() {
   const appState = useContext(appContext);
   const { t } = useTranslation();
   const history = useHistory();
   const location = useLocation();
-  const { input, setInput } = appState.search;
+  const [_input, _setInput] = useRecoilState(input);
+
+  //const { input, setInput } = appState.search;
 
   return (
     <div>
@@ -23,9 +26,10 @@ export function Searchbar() {
           <MagnifyingGlassIcon className="h-5 w-5 text-zinc-600" />
         </div>
         <input
-          value={input}
+          type="text"
+          value={_input}
           onChange={(e) => {
-            setInput(e.target.value);
+            _setInput(e.target.value);
             if (!location.pathname.includes("search")) history.push("/search");
           }}
           className="input input-secondary block pl-10 py-2.5 md:py-[14px] text-xs md:text-base w-full placeholder-zinc-600 focus:placeholder-white rounded-lg md:rounded-full bg-zinc-900 text-zinc-100 outline-none focus:ring-2 focus:ring-inset focus:ring-white"
@@ -37,19 +41,17 @@ export function Searchbar() {
 }
 
 export default function Search() {
-  const appState = useContext(appContext);
-  const { input } = appState.search;
+
   const [ _allPodcasts, _setAllPodcasts ] = useRecoilState(allPodcasts);
   const [ _titles, _setTitles ] = useRecoilState(titles);
   const [ loaded, setLoaded ] = useState(false);
   const [ error, setError ] = useState();
-  const loading = appState.otherComponentsLoading.titles;
-  
+  const [_input, ] = useRecoilState(input);
   const filteredPodcasts = _titles ? 
     _titles.filter((p) => {
-      if (input === '') return;
+      if (_input === '') return;
       if (p.type === "eid") return;
-      else return p.title.toLowerCase().includes(input.toLowerCase());
+      else return p.title.toLowerCase().includes(_input.toLowerCase());
     })
     :
     "";
@@ -58,7 +60,6 @@ export default function Search() {
   const abortContr = new AbortController();
   useEffect(() => {
     async function fetchData() {
-
       // Fetch Podcasts
       const filters = [
         { type: "episodescount", desc: t("sorting.episodescount") },
@@ -71,8 +72,6 @@ export default function Search() {
       // Fetch Titles & Cache
       const cached = await cacheTitles({signal: abortContr.signal});
       _setTitles(cached);
-      console.log("TITLE FROM RECOIL: ", _titles);
-
     }
     
     if(!loaded) {
@@ -88,7 +87,7 @@ export default function Search() {
     <div className="text-white h-full pb-80">
       {!loaded ? <div className="text-2xl text-white font-bold mb-6">{t("search.loading")}</div> : (
         <div>
-          {input.length !== 0 ?
+          {_input.length !== 0 ?
             (
               <>
                 <div className="text-2xl text-white font-bold mb-6">{t("search.podcasts")}</div>

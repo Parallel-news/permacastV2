@@ -47,7 +47,6 @@ export default function Home() {
     <div className="w-full h-[100px] rounded-3xl mt-2 animate-pulse bg-gray-300/30"></div>
   );
   useEffect(() => {
-    console.log("home.jsx useEffect");
     const getAllData_ = () => {
       setSecondaryData_(
         primaryData_.podcasts.filter((obj) => {
